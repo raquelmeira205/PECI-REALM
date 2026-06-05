@@ -14,19 +14,21 @@ Developed at the University of Aveiro as part of the PECI course, in the context
   IWR6843ODS radar                   ┌─────────┐   ┌──────────┐
        │ USB/UART                    │Mosquitto│   │ InfluxDB │
   Raspberry Pi                       │(broker) │   │(TS data) │
-  ├─ stream_manager.py               └────┬────┘   └────┬─────┘
-  │    └─ publishes point cloud           │              │
-  │       + track data via MQTT      ┌────▼──────────────▼─────┐
-  ├─ node_client.py                  │   Django + Daphne (web)  │
-  │    └─ heartbeat, commands        │   mqtt_worker (worker)   │
-  └─ radar_manager.py                │   Redis (WebSockets)     │
-       └─ boot lifecycle,            └──────────────────────────┘
-          Wi-Fi provisioning                    │
+  radar_manager.py                   └────┬────┘   └────┬─────┘
+  ├─ [network] node_client.py             │              │
+  │    ├─ heartbeat + commands       ┌────▼──────────────▼─────┐
+  │    └─ spawns on "start":         │   Django + Daphne (web)  │
+  │         stream_manager.py        │   mqtt_worker (worker)   │
+  │         (UART read → MQTT pub)   │   Redis (WebSockets)     │
+  └─ [no network] config_server.py   └──────────────────────────┘
+       (AP captive portal)                      │
                                          Web Dashboard
                            (heatmaps, deployment wizard, developer mode)
 ```
 
 Data path: `radar/{serial}/raw` → MQTT worker → InfluxDB → WebSocket → browser.
+
+InfluxDB stores all incoming radar data continuously as a time series. SQLite is used separately by the developer app to store session-scoped relational records (`AcquisitionSession` and `RadarFrame` models), allowing raw frames to be linked to a named capture session for offline export and analysis.
 
 ---
 
@@ -188,7 +190,7 @@ If the Pi cannot reach the internet on boot, it creates a Wi-Fi access point. Co
 
 ## Key Features
 
-- **Semi-automatic multi-radar spatial calibration** -> Nelder-Mead optimisation aligns multiple sensors into a shared coordinate frame. A step-by-step wizard in the dashboard guides the installer.
+- **Semi-automatic multi-radar spatial calibration** -> Nelder-Mead optimisation of a rigid rotation-translation transform (azimuth + tilt angles) per slave radar, aligning each sensor's local coordinate frame into a shared room reference. A step-by-step wizard in the dashboard guides the installer through the process.
 - **NTP-based temporal synchronisation** -> Each node reports its NTP offset on demand; the server triggers sync before developer-mode capture sessions to ensure frame timestamps are aligned.
 - **Deployment wizard** -> A guided, non-technical installer flow with live progress feedback over WebSockets. Handles device discovery, configuration, calibration, and validation.
 - **Live + accumulated heatmaps** -> The monitoring dashboard shows both real-time occupancy heatmaps and historical presence density overlaid on the room layout.
@@ -224,6 +226,37 @@ radar/{serial}/command    Server → node commands:  start | stop | ntp_sync
 ```
 
 Server subscribes to wildcards `radar/+/hello` and `radar/+/status` for fleet management.
+
+### MQTT payload structure (`radar/{serial}/raw`)
+
+Frames are batched into an array to reduce network overhead. Each element is one parsed radar frame:
+
+```json
+[
+  {
+    "metadata": {
+      "sensor_id": "SN_000001",
+      "server_timestamp": "2025-01-15T10:23:45.123456",
+      "frame_number": 42
+    },
+    "environment": { "room_occupancy": 2 },
+    "data": {
+      "targets": [
+        {
+          "target_id": 1,
+          "position": { "x": 1.24, "y": 3.15, "z": 0.12 },
+          "velocity": { "x": 0.10, "y": 0.05, "z": 0.00 }
+        }
+      ],
+      "raw_point_cloud": [
+        [1.20, 3.10, 0.10, 0.15, 12.5]
+      ]
+    }
+  }
+]
+```
+
+Each entry in `raw_point_cloud` is a `[x, y, z, velocity, snr]` array.
 
 ---
 
