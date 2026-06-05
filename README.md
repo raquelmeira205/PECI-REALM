@@ -1,8 +1,8 @@
-# REALM — Real-time Edge-based Activity and Location Monitor
+# REALM — Radar-based Easy-deploy And Low-intrusive Monitoring
 
 REALM is a privacy-preserving low-intrusive indoor human monitoring system built for smart home and elderly care applications. It uses Texas Instruments IWR6843ODS mmWave radar sensors deployed as wireless edge nodes to detect and track occupant presence, movement, and activity patterns, without cameras or microphones. Sensor data flows over MQTT from each Raspberry Pi node to a central Django-based home server, where it is stored in InfluxDB and visualised through a live web dashboard.
 
-Developed at the University of Aveiro as part of the PECI course, in the context of the Casa Viva+ and VITALITY smart home research projects.
+Developed at the University of Aveiro as part of the final bachelor's project, in the context of the Casa Viva+ and VITALITY smart home research projects.
 
 ---
 
@@ -262,7 +262,7 @@ Each entry in `raw_point_cloud` is a `[x, y, z, velocity, snr]` array.
 
 ## Academic Context
 
-This project was developed as part of the **PECI** (Projeto de Engenharia e Conceção Integrada) programme at the **University of Aveiro**, in collaboration with the **Casa Viva+** and **VITALITY** smart home research initiatives. The goal is to support low-intrusive, privacy-respecting monitoring of elderly residents in assisted-living environments, enabling activity recognition and anomaly detection without cameras.
+This project was developed as part of the **PECI** (Projeto em Engenharia de Computadores e Informática) programme at the **University of Aveiro**, in collaboration with the **Casa Viva+** and **VITALITY** smart home research initiatives. The goal is to support low-intrusive, privacy-respecting monitoring of elderly residents in assisted-living environments, enabling activity recognition and anomaly detection without cameras.
 
 ---
 
