@@ -1,0 +1,30 @@
+{% if status == 'idle' %}
+<div id="capture-zone" class="flex items-center gap-2">
+  <button
+    hx-post="/deployment/api/calibration-start-inline/{{ room.id }}/{{ radar.network_id }}/"
+    hx-target="#capture-zone"
+    hx-swap="outerHTML"
+    class="bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold px-3 py-1.5 text-[11px] uppercase tracking-wider rounded-lg border border-emerald-500 shadow-sm flex items-center gap-1.5 transition-all"
+  >
+    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+    Iniciar Captura
+  </button>
+</div>
+
+{% elif status == 'capturing' %}
+<div id="capture-zone" class="flex items-center gap-2">
+  <div class="relative flex items-center">
+    <span class="absolute inline-flex w-2.5 h-2.5 rounded-full bg-red-400 opacity-75 animate-ping"></span>
+    <span class="relative inline-flex w-2.5 h-2.5 rounded-full bg-red-500"></span>
+  </div>
+  <button
+    hx-post="/deployment/api/calibration-stop/{{ room.id }}/{{ radar.network_id }}/"
+    hx-target="#wizard-content"
+    hx-swap="innerHTML"
+    class="bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold px-3 py-1.5 text-[11px] uppercase tracking-wider rounded-lg border border-red-500 shadow-sm flex items-center gap-1.5 transition-all"
+  >
+    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>
+    Encerrar Captura
+  </button>
+</div>
+{% endif %}

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+
+# Django
+db.sqlite3
+
+# Docker / service data
+influxdb-data/
+mosquitto/data/
+mosquitto/log/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

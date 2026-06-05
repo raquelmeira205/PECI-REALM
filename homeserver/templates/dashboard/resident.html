@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RADAR PROJECT - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind = { 
+      config: { 
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            }
+          }
+        }
+      } 
+    };
+    (function () {
+      const t = localStorage.getItem("theme") ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.classList.toggle("dark", t === "dark");
+    })();
+  </script>
+  <style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    canvas { image-rendering: pixelated; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.3); border-radius: 10px; }
+    .dark ::-webkit-scrollbar-thumb { background-color: rgba(75, 85, 99, 0.5); }
+  </style>
+</head>
+
+<body class="bg-slate-100 dark:bg-slate-900 h-screen overflow-hidden text-slate-800 dark:text-slate-100 flex font-sans transition-colors duration-300">
+
+  <!-- Left Sidebar (Floating style) -->
+  <aside class="w-24 m-4 mr-0 bg-emerald-600 dark:bg-emerald-800 rounded-[32px] flex flex-col items-center py-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-20 relative overflow-hidden">
+    <!-- Subtle gradient background effect -->
+    <div class="absolute inset-0 bg-gradient-to-b from-emerald-500 to-emerald-700 dark:from-emerald-700 dark:to-emerald-900 opacity-50 z-0"></div>
+    
+    <div class="w-12 h-12 bg-white/20 rounded-[18px] flex items-center justify-center mb-12 backdrop-blur-md z-10 border border-white/30 shadow-lg">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+      </svg>
+    </div>
+    
+    <nav class="flex flex-col gap-6 flex-1 z-10">
+      {% if is_developer %}
+        <!-- Dashboard Link (Active) -->
+        <a href="{% url 'dashboard:developer_dashboard' %}" class="w-12 h-12 bg-white rounded-[18px] flex items-center justify-center shadow-lg text-emerald-600 transition-transform hover:scale-105" title="Aceder ao Dashboard">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+        </a>
+        <!-- Developer Home Link (Inactive) -->
+        <a href="{% url 'developer:developer_home' %}" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all" title="Nova Captura">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </a>
+      {% else %}
+        <!-- Resident Home Link (Active) -->
+        <a href="{% url 'dashboard:home' %}" class="w-12 h-12 bg-white rounded-[18px] flex items-center justify-center shadow-lg text-emerald-600 transition-transform hover:scale-105" title="Home">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+        </a>
+        <!-- Resident Activity/Stats (Inactive) -->
+        <a href="{% url 'activity_summary:weekly_summary' %}" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all" title="Estatísticas">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+        </a>
+      {% endif %}
+
+      <!-- User Profile Link (Inactive) -->
+      <a href="#" onclick="openUserProfile(); return false;" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all" title="Perfil de Utilizador">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+      </a>
+    </nav>
+
+    <a href="{% url 'logout' %}" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all mt-auto z-10" title="Terminar Sessão">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+    </a>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 flex flex-col h-screen overflow-y-auto p-4 sm:p-8 xl:p-10">
+    
+    <!-- Header -->
+    <header class="flex justify-between items-end mb-8 fade-in">
+
+      
+      <div class="flex items-center gap-4">
+        <!-- Theme toggle -->
+        <button onclick="(function(){const d=document.documentElement.classList.toggle('dark');localStorage.setItem('theme',d?'dark':'light');})()"
+          class="w-10 h-10 rounded-[14px] bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-500 transition-colors shadow-sm border border-slate-200 dark:border-slate-700">
+          <svg class="w-4 h-4 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"/></svg>
+          <svg class="w-4 h-4 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+        </button>
+        <div class="h-10 px-4 flex items-center justify-center bg-white dark:bg-slate-800 rounded-[14px] shadow-sm border border-slate-200 dark:border-slate-700">
+          <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ role_display }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 flex flex-col gap-8 max-w-[1400px]">
+      
+      <!-- Heatmap Section -->
+      <div class="flex-1 flex flex-col fade-in delay-100">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-4">
+           <div>
+             <h2 class="text-xl font-bold text-slate-900 dark:text-white">Mapa de Presença</h2>
+             <p id="date-range-label" class="text-sm text-slate-500 dark:text-slate-400 mt-1">A carregar...</p>
+           </div>
+           <div class="flex flex-wrap items-center gap-3">
+             <!-- Mode Toggle -->
+             <div class="flex bg-slate-200/60 dark:bg-slate-900/50 p-1 rounded-2xl shadow-inner border border-slate-300/50 dark:border-slate-700/50">
+               <button id="btn-mode-accumulated" class="px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 bg-white dark:bg-slate-700 shadow-md text-slate-900 dark:text-white" onclick="setMode('accumulated')">
+                 Hoje
+               </button>
+               <button id="btn-mode-live" class="px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white" onclick="setMode('live')">
+                 <div class="flex items-center gap-2">
+                   <span class="relative flex h-2 w-2">
+                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 hidden" id="live-ping"></span>
+                     <span class="relative inline-flex rounded-full h-2 w-2 bg-slate-400" id="live-dot"></span>
+                   </span>
+                   Live
+                 </div>
+               </button>
+             </div>
+             
+             {% if rooms %}
+             <div class="flex flex-wrap gap-1 bg-slate-200/60 dark:bg-slate-900/50 p-1 rounded-2xl shadow-inner border border-slate-300/50 dark:border-slate-700/50" id="room-tabs">
+               {% for room in rooms %}
+               <button
+                 class="room-tab px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+                 data-room-id="{{ room.id }}"
+                 data-room-width="{{ room.width }}"
+                 data-room-depth="{{ room.depth }}"
+                 data-room-name="{{ room.name }}">
+                 {{ room.name }}
+               </button>
+               {% endfor %}
+             </div>
+             {% endif %}
+             
+             <a href="/deployment/wizard/?step=2" class="flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-[14px] font-bold text-sm transition-colors shadow-sm border border-slate-200 dark:border-slate-700">
+               <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+               Gerir Divisões
+             </a>
+           </div>
+        </div>
+
+        {% if rooms %}
+        <div class="bg-white dark:bg-slate-800 rounded-[40px] p-6 lg:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 dark:border-slate-700 flex flex-col lg:flex-row gap-8">
+           
+           <!-- Canvas Container -->
+           <div class="lg:w-2/3 flex items-center justify-center min-h-[350px]" id="layout-wrapper">
+             <div class="relative bg-[#000004] rounded-[28px] overflow-hidden shadow-[inset_0_0_20px_rgba(255,255,255,0.05)] border border-white/5 flex items-center justify-center" id="canvas-wrapper">
+               <canvas id="heatmap-canvas" class="block"></canvas>
+               
+               <!-- Loading overlay -->
+               <div id="loading-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#000004]/80 backdrop-blur-sm gap-3 z-10 transition-opacity">
+                 <div class="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+                 <span class="text-white font-medium">A analisar posições...</span>
+               </div>
+
+               <!-- No-data overlay -->
+               <div id="nodata-overlay" class="absolute inset-0 hidden flex-col items-center justify-center bg-[#000004]/90 gap-3 z-10">
+                 <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center">
+                   <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4M12 4v16"/>
+                   </svg>
+                 </div>
+                 <p class="text-slate-400 font-medium">Sem movimentos registados hoje.</p>
+               </div>
+             </div>
+           </div>
+           
+           <!-- Controls & Details Container -->
+           <div class="lg:w-1/3 flex flex-col">
+              <div class="mb-8">
+                <p class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">A visualizar</p>
+                <h3 id="card-room-name" class="text-3xl font-extrabold text-slate-900 dark:text-white mb-1">—</h3>
+                <p id="card-room-dims" class="text-slate-500 dark:text-slate-400 text-sm font-medium"></p>
+              </div>
+                
+              <div class="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 p-6 rounded-[24px] mb-8 relative overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-colors">
+                 
+                 <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-2">Total Deteções Hoje</p>
+                 <p id="point-count" class="text-5xl font-black text-emerald-700 dark:text-emerald-300 tracking-tight">0</p>
+              </div>
+
+              <!-- Color scale -->
+              <div class="mb-8">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Intensidade de Presença</p>
+                <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                  <span class="text-xs font-semibold text-slate-400">Baixa</span>
+                  <div class="flex-1 h-3 rounded-full shadow-inner" style="background: linear-gradient(to right, #000004, #51127c, #b5367a, #f98c0a, #fcffa4);"></div>
+                  <span class="text-xs font-semibold text-slate-400">Alta</span>
+                </div>
+              </div>
+              
+              <div class="mt-auto">
+                 <button id="refresh-btn" onclick="loadHeatmap()" class="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-white font-bold py-4 rounded-[20px] flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Atualizar Mapa Agora
+                 </button>
+                 <p id="last-updated" class="text-xs text-center font-medium text-slate-400 mt-4"></p>
+              </div>
+           </div>
+        </div>
+        {% else %}
+        <div class="bg-white dark:bg-slate-800 rounded-[40px] border border-slate-200 dark:border-slate-700 p-16 text-center shadow-xl">
+          <div class="w-20 h-20 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Sem Divisões Configuradas</h3>
+          <p class="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Para visualizar o mapa de calor e a sua atividade física, é necessário primeiro configurar a habitação e os sensores Radar.</p>
+          <a href="/deployment/wizard/" class="inline-block bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-[20px] transition-all shadow-lg hover:shadow-emerald-500/30">
+            Iniciar Configuração
+          </a>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+  (function () {
+    // ── Constants ───────────────────────────────────────────────────────────
+    const RESOLUTION   = 0.1;
+    const BRUSH_RADIUS = 0.15;
+    const MAX_HEAT     = 25;
+
+    const INFERNO = [
+      [0,    [  0,  0,  4]],
+      [0.13, [ 22, 11, 57]],
+      [0.25, [ 81, 18,124]],
+      [0.38, [138, 34,110]],
+      [0.5,  [181, 54,122]],
+      [0.63, [224, 92, 97]],
+      [0.75, [249,140, 10]],
+      [0.88, [252,200, 37]],
+      [1.0,  [252,255,164]],
+    ];
+
+    function infernoColor(t) {
+      t = Math.max(0, Math.min(1, t));
+      for (let i = 1; i < INFERNO.length; i++) {
+        const [t1, c1] = INFERNO[i];
+        if (t <= t1) {
+          const [t0, c0] = INFERNO[i - 1];
+          const f = (t - t0) / (t1 - t0);
+          return c0.map((v, j) => Math.round(v + f * (c1[j] - v)));
+        }
+      }
+      return INFERNO[INFERNO.length - 1][1];
+    }
+
+    function buildGrid(points, roomW, roomD) {
+      const cols = Math.max(1, Math.ceil(roomW / RESOLUTION));
+      const rows = Math.max(1, Math.ceil(roomD / RESOLUTION));
+      const grid = new Float32Array(rows * cols);
+      const brushCells = Math.max(1, Math.floor(BRUSH_RADIUS / RESOLUTION));
+
+      for (const { x, y } of points) {
+        const cc = Math.floor(x / RESOLUTION);
+        const rc = Math.floor(y / RESOLUTION);
+        for (let dr = -brushCells; dr <= brushCells; dr++) {
+          for (let dc = -brushCells; dc <= brushCells; dc++) {
+            if (dr * dr + dc * dc <= brushCells * brushCells) {
+              const r2 = rc + dr, c2 = cc + dc;
+              if (r2 >= 0 && r2 < rows && c2 >= 0 && c2 < cols)
+                grid[r2 * cols + c2] += 1;
+            }
+          }
+        }
+      }
+      return { grid, rows, cols };
+    }
+
+    function renderHeatmap(canvas, points, roomW, roomD) {
+      const { grid, rows, cols } = buildGrid(points, roomW, roomD);
+      
+      const layoutWrapper = document.getElementById('layout-wrapper');
+      const maxAvailableW = Math.min(800, layoutWrapper.clientWidth - 32);
+      const maxAvailableH = 500;
+      const aspect = roomD / roomW;
+      
+      let finalW = maxAvailableW;
+      let finalH = finalW * aspect;
+      
+      if (finalH > maxAvailableH) {
+          finalH = maxAvailableH;
+          finalW = finalH / aspect;
+      }
+      
+      canvas.width  = Math.round(finalW);
+      canvas.height = Math.round(finalH);
+
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#000004';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (points.length === 0) return;
+
+      const maxVal = Math.max(...grid, 1);
+      const cellW  = canvas.width  / cols;
+      const cellH  = canvas.height / rows;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const heat = grid[(rows - 1 - r) * cols + c];
+          if (heat === 0) continue;
+          const t = Math.min(heat / Math.min(maxVal, MAX_HEAT), 1);
+          const [R, G, B] = infernoColor(t);
+          ctx.fillStyle = `rgb(${R},${G},${B})`;
+          ctx.fillRect(
+            Math.floor(c * cellW), Math.floor(r * cellH),
+            Math.ceil(cellW) + 1,  Math.ceil(cellH) + 1
+          );
+        }
+      }
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
+    }
+
+    // ── State ───────────────────────────────────────────────────────────────
+    let activeRoomId     = null;
+    let activeRoomW      = null;
+    let activeRoomD      = null;
+    let autoRefreshTimer = null;
+    let currentMode      = 'accumulated';
+
+    // ── DOM refs ────────────────────────────────────────────────────────────
+    const canvas         = document.getElementById('heatmap-canvas');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const nodataOverlay  = document.getElementById('nodata-overlay');
+    const cardRoomName   = document.getElementById('card-room-name');
+    const cardRoomDims   = document.getElementById('card-room-dims');
+    const pointCountEl   = document.getElementById('point-count');
+    const lastUpdatedEl  = document.getElementById('last-updated');
+    const dateRangeLabel = document.getElementById('date-range-label');
+
+    function setLoading(on) {
+      if (loadingOverlay) loadingOverlay.style.display = on ? 'flex' : 'none';
+    }
+    function setNoData(on) {
+      if (nodataOverlay) nodataOverlay.style.display = on ? 'flex' : 'none';
+    }
+
+    window.setMode = function(mode) {
+      currentMode = mode;
+      
+      const btnAcc = document.getElementById('btn-mode-accumulated');
+      const btnLiv = document.getElementById('btn-mode-live');
+      const ping = document.getElementById('live-ping');
+      const dot = document.getElementById('live-dot');
+
+      if (mode === 'accumulated') {
+        btnAcc.className = 'px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 bg-white dark:bg-slate-700 shadow-md text-slate-900 dark:text-white';
+        btnLiv.className = 'px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white';
+        ping.classList.add('hidden');
+        dot.classList.remove('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
+        dot.classList.add('bg-slate-400');
+      } else {
+        btnLiv.className = 'px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 bg-white dark:bg-slate-700 shadow-md text-slate-900 dark:text-white';
+        btnAcc.className = 'px-4 py-1.5 rounded-[14px] text-sm font-bold transition-all duration-300 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white';
+        ping.classList.remove('hidden');
+        dot.classList.remove('bg-slate-400');
+        dot.classList.add('bg-red-500', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
+      }
+      
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(window.loadHeatmap, mode === 'live' ? 5000 : 60000);
+      
+      loadHeatmap();
+    };
+
+    window.loadHeatmap = async function () {
+      if (!activeRoomId) return;
+      setLoading(true);
+      setNoData(false);
+
+      try {
+        const res  = await fetch(`/dashboard/api/heatmap/${activeRoomId}/?mode=${currentMode}`);
+        const data = await res.json();
+        setLoading(false);
+
+        const start = new Date(data.query_range.start);
+        const end   = new Date(data.query_range.end);
+        const fmt   = d => d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+        
+        if(dateRangeLabel) {
+          if (currentMode === 'live') {
+            dateRangeLabel.textContent = `Em tempo real (Últimos 30s)`;
+          } else {
+            dateRangeLabel.textContent = `Atividade de Hoje (${fmt(start)} → ${fmt(end)})`;
+          }
+        }
+
+        const pts = data.points;
+        const n   = pts.length;
+        if(pointCountEl) {
+          pointCountEl.textContent = n.toLocaleString('pt-PT');
+        }
+
+        if (n === 0) {
+          setNoData(true);
+          renderHeatmap(canvas, [], activeRoomW, activeRoomD);
+        } else {
+          renderHeatmap(canvas, pts, activeRoomW, activeRoomD);
+        }
+
+        if(lastUpdatedEl) {
+          lastUpdatedEl.textContent = `Sincronizado: ${new Date().toLocaleTimeString('pt-PT')}`;
+        }
+
+      } catch (err) {
+        setLoading(false);
+        if(lastUpdatedEl) lastUpdatedEl.textContent = 'Falha na sincronização.';
+        console.error(err);
+      }
+    };
+
+    function selectRoom(tab) {
+      document.querySelectorAll('.room-tab').forEach(t => {
+        t.classList.remove('bg-white', 'dark:bg-slate-700', 'shadow-md', 'text-slate-900', 'dark:text-white');
+      });
+      tab.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-md', 'text-slate-900', 'dark:text-white');
+
+      activeRoomId = tab.dataset.roomId;
+      activeRoomW  = parseFloat(tab.dataset.roomWidth);
+      activeRoomD  = parseFloat(tab.dataset.roomDepth);
+
+      if(cardRoomName) cardRoomName.textContent = tab.dataset.roomName;
+      if(cardRoomDims) cardRoomDims.textContent = `Dimensões: ${activeRoomW}m × ${activeRoomD}m`;
+
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(window.loadHeatmap, currentMode === 'live' ? 5000 : 60000);
+
+      loadHeatmap();
+    }
+
+    // ── Init ────────────────────────────────────────────────────────────────
+    const tabs = document.querySelectorAll('.room-tab');
+    if (tabs.length > 0) {
+      tabs.forEach(tab => tab.addEventListener('click', () => selectRoom(tab)));
+      selectRoom(tabs[0]);
+    }
+  })();
+
+  function openUserProfile() {
+    const modal = document.getElementById('userProfileModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    // trigger animation
+    setTimeout(() => {
+      modal.classList.remove('opacity-0');
+      modal.querySelector('div').classList.remove('scale-95');
+    }, 10);
+  }
+  function closeUserProfile() {
+    const modal = document.getElementById('userProfileModal');
+    modal.classList.add('opacity-0');
+    modal.querySelector('div').classList.add('scale-95');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }, 300);
+  }
+  </script>
+
+  <!-- User Profile Modal -->
+  <div id="userProfileModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0">
+    <div class="bg-white dark:bg-slate-800 rounded-[32px] shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">A Minha Conta</h3>
+        <button onclick="closeUserProfile()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      
+      <div class="flex flex-col items-center mb-2">
+        <div class="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center text-4xl font-bold mb-4 shadow-inner border border-emerald-200 dark:border-emerald-800">
+          {{ request.user.first_name|first|default:request.user.username|first|upper }}
+        </div>
+        <h4 class="text-lg font-bold text-slate-900 dark:text-white">{{ request.user.first_name }} {{ request.user.last_name }}</h4>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ request.user.email }}</p>
+        <span class="mt-4 px-4 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-bold uppercase tracking-wider border border-emerald-100 dark:border-emerald-800">
+          {{ request.user.get_role_display }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

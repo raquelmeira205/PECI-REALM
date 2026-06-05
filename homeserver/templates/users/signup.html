@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RADAR PROJECT - Registo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind = { config: { darkMode: "class" } };
+    </script>
+    <script>
+      function initDarkMode() {
+        const htmlEl = document.documentElement;
+        const currentTheme = localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        if (currentTheme === "dark") {
+          htmlEl.classList.add("dark");
+        } else {
+          htmlEl.classList.remove("dark");
+        }
+      }
+      function toggleTheme() {
+          const htmlEl = document.documentElement;
+          if (htmlEl.classList.contains("dark")) {
+              htmlEl.classList.remove("dark");
+              localStorage.setItem("theme", "light");
+          } else {
+              htmlEl.classList.add("dark");
+              localStorage.setItem("theme", "dark");
+          }
+      }
+      initDarkMode();
+    </script>
+    <style>
+      .wizard-card { box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1); }
+      :root.dark .wizard-card { box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
+      .input-field { transition: all 0.3s ease; }
+      .input-field:focus { transform: translateY(-2px); }
+      @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .animate-slide-in { animation: slideIn 0.4s ease; }
+      :root.dark body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f1f5f9; }
+      
+      input[type="password"] {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.5rem;
+        color: #0f172a;
+        transition: all 0.3s ease;
+      }
+      :root.dark input[type="password"] {
+        background-color: #334155;
+        border-color: #475569;
+        color: #f1f5f9;
+      }
+      input[type="password"]:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      }
+      .errorlist { color: #ef4444; font-size: 0.875rem; list-style-type: none; padding: 0; margin-top: 0.25rem; }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800 min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+    <div class="fixed top-4 right-4 z-50">
+        <button onclick="toggleTheme()" class="p-2 bg-white dark:bg-slate-700 rounded-full shadow-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus:outline-none border border-slate-200 dark:border-slate-600">
+            <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg>
+            <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+        </button>
+    </div>
+
+    <div class="w-full max-w-5xl animate-slide-in my-8">
+      <div class="wizard-card bg-white dark:bg-slate-800 rounded-3xl flex flex-col lg:flex-row overflow-hidden border border-slate-200 dark:border-slate-700">
+        
+        <!-- Left Banner (Branding) -->
+        <div class="hidden lg:flex lg:w-5/12 bg-emerald-800 relative flex-col justify-center items-center p-12 overflow-hidden">
+            <!-- Abstract Radar Circles -->
+            <div class="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+                <div class="absolute w-[800px] h-[800px] rounded-full border border-emerald-400"></div>
+                <div class="absolute w-[600px] h-[600px] rounded-full border border-emerald-400"></div>
+                <div class="absolute w-[400px] h-[400px] rounded-full border border-emerald-400"></div>
+                <div class="absolute w-[200px] h-[200px] rounded-full border border-emerald-400 bg-emerald-600/50"></div>
+            </div>
+            
+            <!-- Central Icon/Logo -->
+            <div class="relative z-10 flex flex-col items-center">
+                <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center border border-white/20 shadow-2xl mb-6">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-white tracking-widest uppercase">Radar Project</h2>
+            </div>
+        </div>
+
+        <!-- Right Side (Form) -->
+        <div class="w-full lg:w-7/12 p-8 md:p-12 lg:p-14">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Criar Conta</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-2">Preencha os detalhes abaixo para criar o seu perfil no sistema.</p>
+            </div>
+
+            <form method="POST" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded text-red-700 dark:text-red-400 text-sm">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">Nome</label>
+                        <input type="text" name="first_name" required value="{{ form.first_name.value|default_if_none:'' }}"
+                            class="input-field w-full px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none">
+                        {{ form.first_name.errors }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">Apelido</label>
+                        <input type="text" name="last_name" required value="{{ form.last_name.value|default_if_none:'' }}"
+                            class="input-field w-full px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none">
+                        {{ form.last_name.errors }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">Email</label>
+                    <input type="email" name="email" required value="{{ form.email.value|default_if_none:'' }}"
+                        class="input-field w-full px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none">
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">Perfil</label>
+                        <select name="role" required class="input-field w-full px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none appearance-none">
+                            <option value="RESIDENT" {% if form.role.value == 'RESIDENT' %}selected{% endif %}>Residente</option>
+                            <option value="CAREGIVER" {% if form.role.value == 'CAREGIVER' %}selected{% endif %}>Cuidador</option>
+                            <option value="DEVELOPER" {% if form.role.value == 'DEVELOPER' %}selected{% endif %}>Programador</option>
+                        </select>
+                        {{ form.role.errors }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">Data de Nascimento</label>
+                        <input type="date" name="birth_date" value="{{ form.birth_date.value|default_if_none:'' }}"
+                            class="input-field w-full px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 rounded-xl text-slate-900 dark:text-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none">
+                        {{ form.birth_date.errors }}
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+                    {% for field in form %}
+                        {% if field.name not in 'first_name last_name email role birth_date gdpr_consent' %}
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-900 dark:text-slate-200 mb-2">{{ field.label }}</label>
+                                {{ field }}
+                                {{ field.errors }}
+                                {% if field.help_text %}
+                                    <p class="text-xs text-slate-400 mt-1.5">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="pt-2">
+                    <div class="flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                        <input type="checkbox" name="gdpr_consent" required class="mt-0.5 w-5 h-5 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500 bg-white dark:bg-slate-800">
+                        <label class="text-sm text-slate-700 dark:text-slate-300 leading-snug">
+                            Aceito os <a href="#" class="font-bold text-emerald-600 dark:text-emerald-400 hover:underline">Termos de Processamento de Dados (RGPD)</a> e concordo em prosseguir com esta configuração.
+                        </label>
+                    </div>
+                    {{ form.gdpr_consent.errors }}
+                </div>
+
+                <button type="submit" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <span>Finalizar Registo</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+                
+                <div class="pt-4 text-center text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    Já tem uma conta? <a href="{% url 'login' %}" class="text-emerald-600 dark:text-emerald-400 hover:underline">Fazer Login</a>
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

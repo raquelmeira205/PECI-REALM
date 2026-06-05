@@ -1,0 +1,295 @@
+{% load static %}
+
+<script>
+  window.ROOM_BOUNDS   = {{ room_bounds_json|safe }};
+  window.RADAR_CONFIGS = {{ radar_configs_json|safe }};
+  window.FUSION_URL    = "/deployment/api/fusion-data/{{ room.id }}/";
+</script>
+
+<div class="space-y-4">
+  <!-- Progress Bar -->
+  <div class="mb-6 w-full">
+    <div
+      class="flex flex-row items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide w-full overflow-x-auto pb-2 custom-scrollbar"
+    >
+      <button
+        hx-get="/deployment/api/step1/"
+        hx-target="#wizard-content"
+        class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-800/60 transition-colors border border-emerald-200 dark:border-emerald-700/50 flex items-center gap-2 shadow-sm cursor-pointer"
+      >
+        <div
+          class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold"
+        >
+          ✓
+        </div>
+        <span>Habitação</span>
+      </button>
+      <div
+        class="hidden md:block flex-grow h-px bg-slate-300 dark:bg-slate-600 mx-2"
+      ></div>
+      <button
+        hx-get="/deployment/api/step2/"
+        hx-target="#wizard-content"
+        class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-800/60 transition-colors border border-emerald-200 dark:border-emerald-700/50 flex items-center gap-2 shadow-sm cursor-pointer"
+      >
+        <div
+          class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold"
+        >
+          ✓
+        </div>
+        <span>Divisões</span>
+      </button>
+      <div
+        class="hidden md:block flex-grow h-px bg-slate-300 dark:bg-slate-600 mx-2"
+      ></div>
+      <div
+        class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg border border-emerald-500 flex items-center gap-2 shadow-md"
+      >
+        <div
+          class="w-5 h-5 rounded-full bg-white text-emerald-600 flex items-center justify-center text-[11px] font-bold"
+        >
+          3
+        </div>
+        <span>Radares</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cabeçalho -->
+  <div class="text-center">
+    <h2 class="text-xl font-bold text-slate-900 dark:text-white">
+      Verificação de Fusão
+    </h2>
+    <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">
+      Sala:
+      <span class="text-slate-900 dark:text-white font-medium"
+        >{{ room.name }}</span
+      >
+      &nbsp;·&nbsp; {{ room.width }}×{{ room.depth }} m
+    </p>
+  </div>
+
+  <!-- Instruções -->
+  <div
+    class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-300"
+  >
+    <p class="font-semibold mb-1">Como interpretar:</p>
+    <ul
+      class="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-200"
+    >
+      <li>
+        Os pontos <span class="text-emerald-400 font-bold">verdes</span> são do
+        radar master, os
+        <span class="text-orange-400 font-bold">laranjas</span> dos slaves.
+      </li>
+      <li>
+        Se a calibração correu bem, pontos do mesmo alvo devem sobrepor-se.
+      </li>
+      <li>Clique em "Atualizar" para carregar os pontos da última captura.</li>
+    </ul>
+  </div>
+
+  <!-- Canvas -->
+  <div
+    class="bg-white dark:bg-slate-800/80 rounded-xl p-5 border border-slate-200 dark:border-slate-700/80 shadow-sm"
+  >
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">
+        Vista de Topo — Fusão
+      </h3>
+      <button
+        id="btn-fusion-refresh"
+        class="bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/50 text-blue-700 dark:text-blue-400 font-bold transition-all px-3 py-1.5 text-[11px] uppercase tracking-wider rounded-lg border border-blue-200 dark:border-blue-700/50 shadow-sm flex items-center gap-1.5"
+      >
+        <svg
+          class="w-3.5 h-3.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          ></path>
+        </svg>
+        <span>Atualizar</span>
+      </button>
+    </div>
+    <div
+      id="fusion-canvas-container"
+      class="w-full bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200/50 dark:border-slate-700/50 overflow-hidden shadow-inner"
+    >
+      <canvas id="fusion-canvas" class="w-full block"></canvas>
+    </div>
+    <!-- Legenda -->
+    <div
+      class="flex flex-wrap justify-center gap-x-5 gap-y-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-4 uppercase tracking-wider"
+    >
+      <div class="flex items-center gap-1">
+        <span style="color: #34d399">●</span> Master
+      </div>
+      <div class="flex items-center gap-1">
+        <span style="color: #fb923c">●</span> Slave
+      </div>
+      <div class="flex items-center gap-1"><span>★</span> Radar</div>
+    </div>
+    <p id="fusion-status" class="text-center text-xs text-slate-400 mt-2"></p>
+  </div>
+
+  <!-- Botões de navegação -->
+  <div class="flex gap-3 pb-4">
+    <button
+      hx-get="/deployment/api/sync-capture/{{ room.id }}/"
+      hx-target="#wizard-content"
+      hx-swap="innerHTML"
+      class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white font-semibold py-2.5 rounded-lg transition-colors text-sm"
+    >
+      ← Voltar
+    </button>
+    <button
+      onclick="window.location.href = '/dashboard/'"
+      class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg transition-colors text-sm"
+    >
+      Concluir
+    </button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const COLORS = { master: "#34d399", slave: "#fb923c" };
+    const SLAVE_COLORS = ["#fb923c", "#a78bfa", "#f472b6", "#60a5fa"];
+    let slaveIdx = 0;
+    const radarColor = {};
+
+    const bounds = window.ROOM_BOUNDS;
+    const radars = window.RADAR_CONFIGS;
+    radars.forEach((r) => {
+      radarColor[r.sn] = r.is_master
+        ? COLORS.master
+        : SLAVE_COLORS[slaveIdx++ % SLAVE_COLORS.length];
+    });
+
+    const canvas = document.getElementById("fusion-canvas");
+    const container = document.getElementById("fusion-canvas-container");
+    const status = document.getElementById("fusion-status");
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+      canvas.width = container.clientWidth * 0.75;
+      canvas.height =
+        container.clientWidth * 0.75 * (bounds.y_max / bounds.x_max);
+    }
+    resize();
+    window.addEventListener("resize", () => {
+      resize();
+      draw(lastData);
+    });
+
+    let lastData = {};
+
+    function draw(data) {
+      lastData = data;
+      const W = canvas.width,
+        H = canvas.height;
+      const PAD = 40;
+
+      const scaleX = (W - PAD * 2) / bounds.x_max;
+      const scaleY = (H - PAD * 2) / bounds.y_max;
+
+      const toCanvas = (x, y) => ({
+        cx: PAD + x * scaleX,
+        cy: H - PAD - y * scaleY,
+      });
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Fundo
+      ctx.fillStyle = getComputedStyle(canvas).backgroundColor || "#0f172a";
+      ctx.fillRect(0, 0, W, H);
+
+      // Grid
+      ctx.strokeStyle = "rgba(148,163,184,0.15)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= bounds.x_max; x++) {
+        const { cx } = toCanvas(x, 0);
+        const { cy: cy0 } = toCanvas(x, 0);
+        const { cy: cy1 } = toCanvas(x, bounds.y_max);
+        ctx.beginPath();
+        ctx.moveTo(cx, H - PAD);
+        ctx.lineTo(cx, PAD);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= bounds.y_max; y++) {
+        const { cy } = toCanvas(0, y);
+        ctx.beginPath();
+        ctx.moveTo(PAD, cy);
+        ctx.lineTo(W - PAD, cy);
+        ctx.stroke();
+      }
+
+      // Contorno sala
+      ctx.strokeStyle = "#3b82f6";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(PAD, PAD, W - PAD * 2, H - PAD * 2);
+
+      // Eixos labels
+      ctx.fillStyle = "rgba(148,163,184,0.7)";
+      ctx.font = "10px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(`${bounds.x_max}m`, W - PAD, H - PAD + 14);
+      ctx.textAlign = "right";
+      ctx.fillText(`${bounds.y_max}m`, PAD - 4, PAD + 4);
+
+      // Pontos por radar
+      Object.entries(data).forEach(([sn, info]) => {
+        const color = radarColor[sn] || "#94a3b8";
+        ctx.fillStyle = color;
+        (info.points || []).forEach(([x, y]) => {
+          const { cx, cy } = toCanvas(x, y);
+          ctx.beginPath();
+          ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      });
+
+      // Posição dos radares (estrela)
+      radars.forEach((r) => {
+        const { cx, cy } = toCanvas(r.pos_x, r.pos_y);
+        const color = radarColor[r.sn] || "#94a3b8";
+        ctx.fillStyle = color;
+        ctx.font = "bold 16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("★", cx, cy);
+        ctx.font = "9px monospace";
+        ctx.fillStyle = "rgba(255,255,255,0.6)";
+        ctx.fillText(r.sn, cx, cy + 12);
+      });
+      ctx.textBaseline = "alphabetic";
+    }
+
+    async function loadData() {
+      status.textContent = "A carregar...";
+      try {
+        const res = await fetch(window.FUSION_URL);
+        const data = await res.json();
+        draw(data);
+        const total = Object.values(data).reduce(
+          (s, r) => s + (r.points || []).length,
+          0,
+        );
+        status.textContent = `${total} pontos carregados`;
+      } catch (e) {
+        status.textContent = "Erro ao carregar dados";
+      }
+    }
+
+    document
+      .getElementById("btn-fusion-refresh")
+      .addEventListener("click", loadData);
+    loadData();
+  })();
+</script>

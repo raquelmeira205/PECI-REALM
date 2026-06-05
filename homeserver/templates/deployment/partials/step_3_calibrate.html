@@ -1,0 +1,20 @@
+<div class="animate-slide-in flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-slate-700/30 rounded-2xl border border-slate-200 dark:border-slate-700 min-h-[250px] w-full">
+    <div class="relative w-24 h-24 mb-6">
+        <div class="absolute inset-0 border-4 border-emerald-200 dark:border-emerald-900/50 rounded-full animate-ping opacity-20"></div>
+        <div class="absolute inset-0 border-4 border-emerald-200 dark:border-emerald-900/50 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <svg class="w-10 h-10 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </div>
+    </div>
+    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 animate-pulse tracking-widest text-center">A CALIBRAR MESTRE</h3>
+    <p class="text-center text-sm text-slate-500 dark:text-slate-400 max-w-sm mb-6">
+        Por favor aguarde enquanto alinhamos o radar com a realidade da divisão.
+    </p>
+
+    <!-- Simulating completion with a button for now -->
+    <button hx-get="/deployment/api/configure-room/{{ room.id }}/" hx-target="#wizard-content" class="w-full max-w-xs bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span>Concluir Calibração</span>
+    </button>
+</div>

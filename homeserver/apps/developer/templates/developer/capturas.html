@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Developer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind = { config: { darkMode: "class" } };
+      function initDarkMode() {
+        const htmlEl = document.documentElement;
+        const currentTheme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        if (currentTheme === "dark") {
+          htmlEl.classList.add("dark");
+        } else {
+          htmlEl.classList.remove("dark");
+        }
+      }
+      function toggleTheme() {
+        const htmlEl = document.documentElement;
+        if (htmlEl.classList.contains("dark")) {
+          htmlEl.classList.remove("dark");
+          localStorage.setItem("theme", "light");
+        } else {
+          htmlEl.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        }
+      }
+      initDarkMode();
+    </script>
+    <style>
+      .wizard-card {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+      }
+      :root.dark .wizard-card {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-slide-in {
+        animation: slideIn 0.4s ease;
+      }
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-fade-in-scale {
+        animation: fadeInScale 0.5s ease 0.2s both;
+      }
+      :root.dark body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #f1f5f9;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800 min-h-screen p-4 transition-colors duration-300">
+    <div class="fixed top-4 right-4 z-50">
+      <button onclick="toggleTheme()" class="p-2 bg-white dark:bg-slate-700 rounded-full shadow-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors focus:outline-none border border-slate-200 dark:border-slate-600">
+        <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path>
+        </svg>
+        <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="max-w-7xl mx-auto space-y-8">
+      <header class="text-center pt-8">
+        <p class="text-sm uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Developer</p>
+        <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mt-3">Visualização de Capturas</h1>
+        <p class="text-slate-600 dark:text-slate-300 mt-3 max-w-2xl mx-auto">Inicie, nomeie e reveja capturas de dados radar para investigação e análise em tempo real.</p>
+      </header>
+
+      {% if error %}
+      <div class="rounded-3xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-700 p-5 text-red-700 dark:text-red-200">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <section class="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <div class="wizard-card bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 space-y-6">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-600 dark:text-emerald-400">Nova captura</p>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-3">Registar sessão</h2>
+            <p class="text-slate-600 dark:text-slate-400 mt-2">Escolha o radar e dê um nome à sua sessão de dados.</p>
+          </div>
+
+          <form method="post" class="space-y-5">
+            {% csrf_token %}
+            <div>
+              {{ form.radar.label_tag }}
+              {{ form.radar }}
+            </div>
+
+            <div>
+              {{ form.name.label_tag }}
+              {{ form.name }}
+            </div>
+
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200">
+              Iniciar Captura
+            </button>
+          </form>
+
+          {% if active_session %}
+          <div class="rounded-3xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-700 p-5">
+            <p class="text-sm text-emerald-700 dark:text-emerald-200 font-semibold">Captura em curso</p>
+            <p class="text-slate-700 dark:text-slate-300 mt-2">{{ active_session.source_file }}</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Radar: {{ active_session.radar.name }} ({{ active_session.radar.network_id }})</p>
+            <form action="{% url 'developer_stop_capture' active_session.id %}" method="post" class="mt-4">
+              {% csrf_token %}
+              <button type="submit duration-200">
+                Encerrar Captura
+              </button>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="wizard-card bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8">
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div>
+              <p class="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Busca</p>
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-2">Capturas</h2>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-sm text-slate-600 dark:text-slate-300">{{ sessions|length }} registos</span>
+          </div>
+
+          <form method="get" class="mb-6">
+            <label class="sr-only" for="search">Pesquisar capturas</label>
+            <input id="search" name="q" value="{{ query }}" type="search" placeholder="Pesquisar por nome ou radar" class="w-full rounded-2xl border border-slate-300 bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 px-4 py-3 focus:border-emerald-500 focus:ring-emerald-500" />
+          </form>
+
+          <div class="space-y-4">
+            {% for session in sessions %}
+            <article class="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-5">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <p class="text-slate-900 dark:text-white font-semibold">{{ session.source_file }}</p>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Radar: {{ session.radar.name }} · {{ session.radar.network_id }}</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-slate-200 dark:bg-slate-800 px-3 py-1 text-sm text-slate-600 dark:text-slate-300">
+                  {% if session.ended_at %}Concluída{% else %}Em execução{% endif %}
+                </span>
+              </div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Início</p>
+                  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ session.started_at|date:'d/m/Y H:i' }}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Fim</p>
+                  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ session.ended_at|default:'—' }}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Frames</p>
+                  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ session.total_frames }}</p>
+                </div>
+              </div>
+              <div class="mt-4 text-right">
+                <a href="{% url 'dashboard:developer_dashboard' %}" class="w-12 h-12 bg-white rounded-[18px] flex items-center justify-center shadow-lg text-emerald-600 transition-transform hover:scale-105" title="Aceder ao Dashboard">
+  </a>
+  <a href="{% url 'developer:developer_home' %}" class="w-12 h-12 bg-white rounded-[18px] flex items-center justify-center shadow-lg text-emerald-600 transition-transform hover:scale-105" title="Developer Home">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+  </a>k:hover:text-emerald-200 font-semibold">
+                  Ver detalhes
+              
+                  </svg>
+                </a>
+              </div>
+            </article>
+            {% empty %}
+            <div class="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-8 text-center text-slate-500 dark:text-slate-400">
+              Ainda não existem capturas guardadas. Inicie uma nova captura para começar.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

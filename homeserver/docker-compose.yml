@@ -1,0 +1,91 @@
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb_peci
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME:-admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD:-password_estudante_123}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG:-radar_project}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET:-sensors_data}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis_peci
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto_peci
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+    container_name: radar_web
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      TZ: Europe/Lisbon
+      DJANGO_SETTINGS_MODULE: radar_project.settings
+      DEBUG: ${DEBUG:-True}
+      SECRET_KEY: ${SECRET_KEY:-django-insecure-local-dev}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      REDIS_URL: redis://redis:6379/1
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-radar_project}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-sensors_data}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+      MQTT_BROKER_HOST: mosquitto
+    depends_on:
+      - redis
+      - influxdb
+      - mosquitto
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+    container_name: radar_worker
+    command: python manage.py mqtt_worker
+    volumes:
+      - .:/app
+    environment:
+      TZ: Europe/Lisbon
+      DJANGO_SETTINGS_MODULE: radar_project.settings
+      REDIS_URL: redis://redis:6379/1
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-radar_project}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-sensors_data}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+      MQTT_BROKER_HOST: mosquitto
+    depends_on:
+      - redis
+      - influxdb
+      - mosquitto
+    restart: unless-stopped
+
+volumes:
+  influxdb_data:
+  redis_data:
+  mosquitto_data:
+  mosquitto_log:

@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Ambiente de desenvolvimento local e Virtual Env
+venv/
+.env
+.venv
+env/
+ENV/
+
+# Base de Dados Django (DADOS SENSÍVEIS)
+db.sqlite3
+db.sqlite3-journal
+
+# Ficheiros estáticos colecionados (Não se comita, gera-se)
+staticfiles/
+static_root/
+
+# Ficheiros de sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Pastas de IDE
+.vscode/
+.idea/
+
+# Ficheiros gerados por Claude ou Gemini (se aplicável)
+.gemini/
+.claude/
+.docs/

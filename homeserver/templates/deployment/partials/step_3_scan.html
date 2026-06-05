@@ -1,0 +1,77 @@
+{# templates/deployment/partials/step_3_scan.html #}
+<!-- Estados possíveis (variável `status`):
+  scanning  — a procurar radares
+  error     — múltiplos radares detetados
+  calibrate — radar master associado → avança para calibração  ← NOVO
+  success   — radar worker associado → termina o step -->
+
+{% if status == 'scanning' %}
+<div class="text-center p-6 space-y-4"
+     hx-get="/deployment/api/scan/{{ room.id }}/"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML">
+  <div class="animate-pulse text-emerald-400 text-4xl">📡</div>
+  <p class="text-slate-300">{{ msg }}</p>
+</div>
+
+{% elif status == 'error' %}
+<div class="p-4 bg-red-900/30 border border-red-500 text-red-400 rounded-lg text-center">
+  <p>⚠️ {{ msg }}</p>
+</div>
+
+{% elif status == 'found_radars' %}
+<form hx-post="{{ confirm_url }}" hx-target="#config-status-area" hx-swap="innerHTML" class="space-y-4">
+  <div class="p-5 bg-slate-800/60 border border-emerald-600/50 rounded-xl space-y-3 text-left">
+    <p class="text-emerald-400 font-semibold text-lg text-center mb-4">📡 Radares Encontrados</p>
+    {% for radar in radars %}
+      <label class="flex items-center space-x-3 p-3 bg-slate-700/50 rounded-lg cursor-pointer hover:bg-slate-700 border border-transparent hover:border-slate-500 transition-colors">
+        {% if has_master %}
+          <input type="checkbox" name="radar_sns" value="{{ radar.network_id }}" checked class="form-checkbox h-5 w-5 text-emerald-500 rounded border-slate-500 bg-slate-800 focus:ring-emerald-500 focus:ring-offset-slate-800">
+        {% else %}
+          <input type="radio" name="radar_sns" value="{{ radar.network_id }}" {% if forloop.first %}checked{% endif %} class="form-radio h-5 w-5 text-emerald-500 border-slate-500 bg-slate-800 focus:ring-emerald-500 focus:ring-offset-slate-800">
+        {% endif %}
+        <span class="text-slate-300">ID: <span class="font-mono font-bold text-white">{{ radar.network_id }}</span></span>
+      </label>
+    {% endfor %}
+  </div>
+  <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+    Adicionar Selecionados
+  </button>
+  <button type="button" hx-get="/deployment/api/scan/{{ room.id }}/" hx-target="#config-status-area" hx-swap="innerHTML" class="w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+    Voltar a Procurar
+  </button>
+</form>
+
+{% elif status == 'calibrate' %}
+{#
+  Radar master associado.
+  Mostra mensagem de sucesso e carrega o step de calibração via HTMX.
+#}
+<div class="space-y-4">
+  <div class="p-4 bg-emerald-900/30 border border-emerald-600 text-emerald-400 rounded-lg text-center">
+    <p>✅ {{ msg }}</p>
+    <p class="text-sm text-emerald-300 mt-1">A carregar interface de calibração…</p>
+  </div>
+  {# Trigger imediato: carrega o partial de calibração no wizard-content #}
+  <div hx-get="{{ calibrate_url }}"
+       hx-trigger="load"
+       hx-target="#wizard-content"
+       hx-swap="innerHTML">
+  </div>
+</div>
+{% elif status == 'calibrate_worker' %}
+{# Radar worker associado — carrega intro calibração #}
+<div class="space-y-4">
+  <div class="p-4 bg-emerald-900/30 border border-emerald-500 text-emerald-400 rounded-lg text-center">
+    <p>✅ {{ msg }}</p>
+    <p class="text-sm text-emerald-300 mt-1">A preparar calibração do radar secundário…</p>
+  </div>
+  <div hx-get="{{ calibrate_url }}"
+       hx-trigger="load"
+       hx-target="#wizard-content"
+       hx-swap="innerHTML">
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,35 @@
+<div class="animate-slide-in flex flex-col h-full">
+    <div class="mb-6 w-full">
+      <div class="flex flex-row items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide w-full overflow-x-auto pb-2 custom-scrollbar">
+        <button hx-get="/deployment/api/step1/" hx-target="#wizard-content" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-800/60 transition-colors border border-emerald-200 dark:border-emerald-700/50 flex items-center gap-2 shadow-sm cursor-pointer">
+      <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">✓</div>
+      <span>Habitação</span>
+    </button>
+        <div class="hidden md:block flex-grow h-px bg-slate-300 dark:bg-slate-600 mx-2"></div>
+        <button hx-get="/deployment/api/step2/" hx-target="#wizard-content" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-800/60 transition-colors border border-emerald-200 dark:border-emerald-700/50 flex items-center gap-2 shadow-sm cursor-pointer">
+      <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">✓</div>
+      <span>Divisões</span>
+    </button>
+        <div class="hidden md:block flex-grow h-px bg-slate-300 dark:bg-slate-600 mx-2"></div>
+        <div class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg border border-emerald-500 flex items-center gap-2 shadow-md">
+      <div class="w-5 h-5 rounded-full bg-white text-emerald-600 flex items-center justify-center text-[11px] font-bold">3</div>
+      <span>Radares</span>
+    </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-12 mb-8">
+        <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Associação de Radares</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-4 max-w-lg mx-auto">
+            Neste passo vamos associar os radares a cada divisão. Para cada divisão, deverá primeiro associar o <strong>Radar Master</strong> (o radar principal da divisão). Posteriormente poderá adicionar outros radares se necessário.
+        </p>
+    </div>
+
+    <button hx-get="/deployment/api/step3/" hx-target="#wizard-content" class="mt-8 w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <span>Começar a associar radares</span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+    </button>
+</div>

@@ -1,0 +1,49 @@
+<div
+  id="radar-status"
+  hx-swap-oob="true"
+  class="p-6 bg-gradient-to-r from-emerald-50 dark:from-emerald-900/20 to-green-50 dark:to-green-900/20 border-2 border-emerald-400 dark:border-emerald-600 rounded-xl"
+>
+  <div class="flex items-center gap-4">
+    <div class="p-3 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
+      <svg
+        class="w-8 h-8 text-emerald-600 dark:text-emerald-400 animate-bounce"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </div>
+    <div>
+      <p class="font-bold text-emerald-900 dark:text-emerald-200 text-lg">
+        Sucesso!
+      </p>
+      <p class="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
+        Radar <strong>{{ radar.network_id }}</strong> associado à divisão
+        <strong>{{ room.name }}</strong> com sucesso!
+      </p>
+    </div>
+  </div>
+</div>
+
+<button
+  id="btn-finish"
+  hx-swap-oob="true"
+  onclick="window.location.href = '/dashboard/'"
+  class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 active:from-emerald-800 active:to-emerald-700 dark:from-emerald-600 dark:to-emerald-500 dark:hover:from-emerald-500 dark:hover:to-emerald-400 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
+>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M13 10V3L4 14h7v7l9-11h-7z"
+    />
+  </svg>
+  <span>Ir para Dashboard</span>
+</button>
+
+<div id="available-radar-list" hx-swap-oob="true" class="space-y-3"></div>

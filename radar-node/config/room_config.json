@@ -1,0 +1,60 @@
+{
+    "room": {
+        "name": "Quarto PECI",
+        "x_m": 5.5,
+        "y_m": 6.66,
+        "z_m": 3.0,
+        "walls": {
+            "x_min": "porta",
+            "x_max": "janela",
+            "y_min": "cama",
+            "y_max": "quadro"
+        },
+        "notes": "Origem (0,0) no canto porta+cama (inferior esquerdo do mapa). X cresce para janela, Y cresce para quadro."
+    },
+    "radars": {
+        "radar_1": {
+            "label": "Radar 1",
+            "description": "Canto porta+cama (inferior esquerdo do mapa)",
+            "position_m": {
+                "x": 0.46,
+                "y": 0.88,
+                "z": 2.18
+            },
+            "tilt_deg": 89.99997887753923,
+            "azimuth_deg": 26.620567497630105,
+            "cfg_file": "ODS_6m_default.cfg",
+            "enabled": true,
+            "raw_measurements": {
+                "from_porta_cm": 30,
+                "from_cama_cm": 37,
+                "height_cm": 218,
+                "pan_from_vertical_deg": 30,
+                "notes": "x = from_porta = 0.30 (porta em x_min=0). Azimute 90deg: aponta +X para janela."
+            },
+            "time_offset_ms": -2470.0093269348145
+        },
+        "radar_2": {
+            "label": "Radar 2",
+            "description": "Junto a janela, meio da sala em Y",
+            "position_m": {
+                "x": 4.3,
+                "y": 3.76,
+                "z": 2.14
+            },
+            "tilt_deg": 68.4,
+            "azimuth_deg": 238.0,
+            "cfg_file": "ODS_6m_default.cfg",
+            "enabled": true,
+            "raw_measurements": {
+                "from_janela_cm": 55,
+                "from_cama_cm": 376,
+                "from_porta_cm_inconsistente": 427,
+                "height_cm": 218,
+                "pan_from_vertical_deg": 15,
+                "notes": "x = x_m - from_janela = 6.66 - 0.55 = 6.11 (janela em x_max=6.66). Azimute 270deg: aponta -X para porta."
+            },
+            "time_offset_ms": 2470.0093269348145
+        }
+    }
+}

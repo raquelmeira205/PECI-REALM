@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Developer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind = { config: { darkMode: "class" } };
+      function initDarkMode() {
+        const htmlEl = document.documentElement;
+        const currentTheme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        if (currentTheme === "dark") {
+          htmlEl.classList.add("dark");
+        } else {
+          htmlEl.classList.remove("dark");
+        }
+      }
+      function toggleTheme() {
+        const htmlEl = document.documentElement;
+        if (htmlEl.classList.contains("dark")) {
+          htmlEl.classList.remove("dark");
+          localStorage.setItem("theme", "light");
+        } else {
+          htmlEl.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        }
+      }
+      initDarkMode();
+    </script>
+    <style>
+      .wizard-card {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+      }
+      :root.dark .wizard-card {
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-slide-in {
+        animation: slideIn 0.4s ease;
+      }
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-fade-in-scale {
+        animation: fadeInScale 0.5s ease 0.2s both;
+      }
+      :root.dark body {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #f1f5f9;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-100 dark:bg-slate-900 h-screen overflow-hidden text-slate-800 dark:text-slate-100 flex font-sans transition-colors duration-300">
+    <!-- Left Sidebar -->
+    <aside class="w-24 m-4 mr-0 bg-emerald-600 dark:bg-emerald-800 rounded-[32px] flex flex-col items-center py-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-20 relative overflow-hidden shrink-0">
+      <div class="absolute inset-0 bg-gradient-to-b from-emerald-500 to-emerald-700 dark:from-emerald-700 dark:to-emerald-900 opacity-50 z-0"></div>
+      
+      <div class="w-12 h-12 bg-white/20 rounded-[18px] flex items-center justify-center mb-12 backdrop-blur-md z-10 border border-white/30 shadow-lg">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+        </svg>
+      </div>
+      
+      <nav class="flex flex-col gap-6 flex-1 z-10">
+        <!-- Dashboard Link (Inactive) -->
+        <a href="{% url 'dashboard:developer_dashboard' %}" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all" title="Aceder ao Dashboard">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+        </a>
+        
+        <!-- Developer Home Link (Active) -->
+        <a href="{% url 'developer:developer_home' %}" class="w-12 h-12 bg-white rounded-[18px] flex items-center justify-center shadow-lg text-emerald-600 transition-transform hover:scale-105" title="Nova Captura">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </a>
+
+        <!-- User Profile Link (Inactive) -->
+        <a href="#" onclick="openUserProfile(); return false;" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all" title="Perfil de Utilizador">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </a>
+      </nav>
+
+      <a href="{% url 'logout' %}" class="w-12 h-12 flex items-center justify-center text-emerald-200 hover:text-white hover:bg-white/10 rounded-[18px] transition-all mt-auto z-10" title="Terminar Sessão">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+      </a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto p-4 sm:p-8 xl:p-10">
+    <!-- Header -->
+    <header class="flex justify-between items-end mb-8 animate-slide-in">
+      <div>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Visualização de Capturas</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Inicie, nomeie e reveja capturas de dados radar em tempo real.</p>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <!-- Theme toggle -->
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-[14px] bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-500 transition-colors shadow-sm border border-slate-200 dark:border-slate-700 focus:outline-none">
+          <svg class="w-4 h-4 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path>
+          </svg>
+          <svg class="w-4 h-4 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+          </svg>
+        </button>
+        <div class="h-10 px-4 flex items-center justify-center bg-white dark:bg-slate-800 rounded-[14px] shadow-sm border border-slate-200 dark:border-slate-700">
+          <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Developer</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto space-y-8 w-full">
+
+      {% if error %}
+      <div class="rounded-3xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-700 p-5 text-red-700 dark:text-red-200">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <section class="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <div class="wizard-card bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 space-y-6">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-600 dark:text-emerald-400">Nova captura</p>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-3">Registar sessão</h2>
+            <p class="text-slate-600 dark:text-slate-400 mt-2">Dê um nome à sessão. Por defeito, todos os radares online participam na captura.</p>
+          </div>
+
+          <form method="post" class="space-y-5" id="capture-form">
+            {% csrf_token %}
+
+            <div>
+              {{ form.name.label_tag }}
+              {{ form.name }}
+            </div>
+
+            <!-- Radar Filter Row -->
+            <div class="relative">
+              <div class="flex items-center gap-3">
+                <p class="text-xs uppercase tracking-[0.25em] text-slate-400 flex-1">Radares selecionados: <span id="radar-count-label" class="text-emerald-600 dark:text-emerald-400 font-bold">Todos ({{ available_radars|length }})</span></p>
+                <button type="button" id="filter-btn" onclick="toggleRadarFilter()"
+                  class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all text-sm font-medium">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                  </svg>
+                  Filtrar
+                </button>
+              </div>
+
+              <!-- Filter Popover -->
+              <div id="radar-filter-popover"
+                class="hidden absolute right-0 top-full mt-2 z-50 w-72 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl p-4 space-y-3">
+                <div class="flex items-center justify-between mb-1">
+                  <p class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Radares Online</p>
+                  <button type="button" onclick="selectAllRadars()" class="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold">Selec. todos</button>
+                </div>
+
+                {% if available_radars %}
+                  {% for radar in available_radars %}
+                  <label class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group">
+                    <input type="checkbox" name="radar_ids" value="{{ radar.id }}"
+                      id="radar-{{ radar.id }}"
+                      class="radar-checkbox w-4 h-4 text-emerald-600 border-slate-300 rounded focus:ring-emerald-500"
+                      onchange="updateRadarCountLabel()">
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ radar.network_id }}</p>
+                      <p class="text-xs text-slate-400 truncate">{{ radar.network_id }}</p>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                  </label>
+                  {% endfor %}
+                {% else %}
+                  <p class="text-sm text-slate-400 dark:text-slate-500 text-center py-2">Nenhum radar online.</p>
+                {% endif %}
+
+                <button type="button" onclick="toggleRadarFilter()"
+                  class="w-full text-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 pt-1 transition-colors">Fechar</button>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 18.364A9 9 0 1118.364 5.636m0 0A9 9 0 015.636 18.364M12 8v4l3 3"/>
+              </svg>
+              Iniciar Captura
+            </button>
+          </form>
+
+          {% if active_sessions %}
+          <div class="rounded-3xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/10 dark:border-emerald-700 p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-emerald-700 dark:text-emerald-200 font-semibold">Captura em curso</p>
+              <span class="text-xs bg-emerald-200 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200 px-2 py-0.5 rounded-full font-bold">{{ active_sessions|length }} radar{{ active_sessions|length|pluralize:",es" }}</span>
+            </div>
+            <p class="text-slate-700 dark:text-slate-300 font-medium">{{ active_sessions.0.source_file }}</p>
+            <div class="space-y-1">
+              {% for s in active_sessions %}
+              <p class="text-xs text-slate-500 dark:text-slate-400">↳ {{ s.radar.network_id }}</p>
+              {% endfor %}
+            </div>
+            <div class="space-y-2 pt-1">
+              {% for s in active_sessions %}
+              <form action="{% url 'developer:developer_stop_capture' s.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition-all duration-200">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                  Encerrar {{ s.radar.network_id }}
+                </button>
+              </form>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="wizard-card bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8">
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <div>
+              <p class="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Busca</p>
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-2">Capturas</h2>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-700 px-3 py-1 text-sm text-slate-600 dark:text-slate-300">{{ sessions|length }} registos</span>
+          </div>
+
+          <form method="get" class="mb-6">
+            <label class="sr-only" for="search">Pesquisar capturas</label>
+            <input id="search" name="q" value="{{ query }}" type="search" placeholder="Pesquisar por nome ou radar" class="w-full rounded-2xl border border-slate-300 bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 px-4 py-3 focus:border-emerald-500 focus:ring-emerald-500" />
+          </form>
+
+          <div class="space-y-4">
+            {% for session in sessions %}
+            <article class="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-5">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <p class="text-slate-900 dark:text-white font-semibold">{{ session.source_file }}</p>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Radar: {{ session.radar.network_id }}</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-slate-200 dark:bg-slate-800 px-3 py-1 text-sm text-slate-600 dark:text-slate-300">
+                  {% if session.ended_at %}Concluída{% else %}Em execução{% endif %}
+                </span>
+              </div>
+              <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Início</p>
+                  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ session.started_at|date:'d/m/Y H:i' }}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Fim</p>
+                  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ session.ended_at|default:'—' }}</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Frames</p>
+                  <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">{{ session.total_frames }}</p>
+                </div>
+              </div>
+              <div class="mt-4 text-right">
+                <a href="{% url 'developer:developer_session_detail' session.id %}" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-200 font-semibold">
+                  Ver detalhes
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            </article>
+            {% empty %}
+            <div class="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-8 text-center text-slate-500 dark:text-slate-400">
+              Ainda não existem capturas guardadas. Inicie uma nova captura para começar.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    </div>
+    </div>
+    </main>
+
+    <!-- User Profile Modal -->
+    <div id="userProfileModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm transition-opacity opacity-0">
+      <div class="bg-white dark:bg-slate-800 rounded-[32px] shadow-2xl p-8 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 border border-slate-200 dark:border-slate-700">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white">A Minha Conta</h3>
+          <button onclick="closeUserProfile()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        
+        <div class="flex flex-col items-center mb-2">
+          <div class="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center text-4xl font-bold mb-4 shadow-inner border border-emerald-200 dark:border-emerald-800">
+            {{ request.user.first_name|first|default:request.user.username|first|upper }}
+          </div>
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white">{{ request.user.first_name }} {{ request.user.last_name }}</h4>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ request.user.email }}</p>
+          <span class="mt-4 px-4 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-bold uppercase tracking-wider border border-emerald-100 dark:border-emerald-800">
+            {{ request.user.get_role_display }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    function openUserProfile() {
+      const modal = document.getElementById('userProfileModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      // trigger animation
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('div').classList.remove('scale-95');
+      }, 10);
+    }
+    function closeUserProfile() {
+      const modal = document.getElementById('userProfileModal');
+      modal.classList.add('opacity-0');
+      modal.querySelector('div').classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }, 300);
+    }
+
+    // ── Radar Filter Popover ────────────────────────────────────────────────
+    const totalRadars = document.querySelectorAll('.radar-checkbox').length;
+
+    function toggleRadarFilter() {
+      const popover = document.getElementById('radar-filter-popover');
+      popover.classList.toggle('hidden');
+    }
+
+    function updateRadarCountLabel() {
+      const checked = document.querySelectorAll('.radar-checkbox:checked').length;
+      const label   = document.getElementById('radar-count-label');
+      if (!label) return;
+      if (checked === 0) {
+        label.textContent = `Todos (${totalRadars})`;
+      } else {
+        label.textContent = `${checked} de ${totalRadars}`;
+      }
+    }
+
+    function selectAllRadars() {
+      document.querySelectorAll('.radar-checkbox').forEach(cb => cb.checked = false);
+      updateRadarCountLabel();
+    }
+
+    // Fechar ao clicar fora do popover
+    document.addEventListener('click', function (e) {
+      const popover = document.getElementById('radar-filter-popover');
+      const btn     = document.getElementById('filter-btn');
+      if (popover && !popover.classList.contains('hidden')) {
+        if (!popover.contains(e.target) && !btn.contains(e.target)) {
+          popover.classList.add('hidden');
+        }
+      }
+    });
+    </script>
+  </body>
+</html>

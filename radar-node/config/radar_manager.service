@@ -1,0 +1,20 @@
+rasp2@rasp2:~ $ sudo cat /etc/systemd/system/radar_manager.service 
+[sudo] password for rasp2: 
+[Unit]
+Description=Radar Connection Manager & Failover
+After=network.target network-online.target syslog.target wpa_supplicant.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/rasp2
+ExecStart=/usr/bin/python3 /home/rasp2/radar_manager.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=radar_manager
+
+[Install]
+WantedBy=multi-user.target
