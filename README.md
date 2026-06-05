@@ -2,7 +2,7 @@
 
 REALM is a privacy-preserving low-intrusive indoor human monitoring system built for smart home and elderly care applications. It uses Texas Instruments IWR6843ODS mmWave radar sensors deployed as wireless edge nodes to detect and track occupant presence, movement, and activity patterns, without cameras or microphones. Sensor data flows over MQTT from each Raspberry Pi node to a central Django-based home server, where it is stored in InfluxDB and visualised through a live web dashboard.
 
-Developed at the University of Aveiro as part of the PECI course, in the context of the Casa Viva+ and VITALITY smart home research projects.
+Developed at the University of Aveiro as part of the final bachelor's project, in the context of the Casa Viva+ and VITALITY smart home research projects.
 
 ---
 
