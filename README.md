@@ -229,7 +229,7 @@ Server subscribes to wildcards `radar/+/hello` and `radar/+/status` for fleet ma
 
 ## Academic Context
 
-This project was developed as part of the **PECI** (Projeto de Engenharia e Conceção Integrada) programme at the **University of Aveiro**, in collaboration with the **Casa Viva+** and **VITALITY** smart home research initiatives. The goal is to support low-intrusive, privacy-respecting monitoring of elderly residents in assisted-living environments, enabling activity recognition and anomaly detection without cameras.
+This project was developed as part of the **PECI** (Projeto em Engenharia de Computadores e Informática) programme at the **University of Aveiro**, in collaboration with the **Casa Viva+** and **VITALITY** smart home research initiatives. The goal is to support low-intrusive, privacy-respecting monitoring of elderly residents in assisted-living environments, enabling activity recognition and anomaly detection without cameras.
 
 ---
 
