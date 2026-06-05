@@ -1,4 +1,4 @@
-# REALM — Real-time Edge-based Activity and Location Monitor
+# REALM — Real-time Easy-deploy And Low-intrusive Monitoring
 
 REALM is a privacy-preserving low-intrusive indoor human monitoring system built for smart home and elderly care applications. It uses Texas Instruments IWR6843ODS mmWave radar sensors deployed as wireless edge nodes to detect and track occupant presence, movement, and activity patterns, without cameras or microphones. Sensor data flows over MQTT from each Raspberry Pi node to a central Django-based home server, where it is stored in InfluxDB and visualised through a live web dashboard.
 
