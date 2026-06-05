@@ -12,7 +12,7 @@ MAX_WAIT_SECONDS = 60
 # Paths
 RADAR_SCRIPT = os.path.join(os.path.dirname(__file__), "node_client.py")
 CONFIG_SERVER_SCRIPT = os.path.join(os.path.dirname(__file__), "config_server.py")
-CONFIG_FILE = "/home/rasp2/sensor_config.json"
+CONFIG_FILE = "/home/pi/realm-node/config/sensor_config.json"
 
 # ==========================================
 # NETWORK / INTERFACE HELPERS

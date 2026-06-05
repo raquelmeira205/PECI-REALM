@@ -9,10 +9,10 @@ services:
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
       DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME:-admin}
-      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD:-password_estudante_123}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD:?INFLUXDB_INIT_PASSWORD must be set in .env}
       DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_ORG:-radar_project}
       DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_BUCKET:-sensors_data}
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_TOKEN:?INFLUXDB_TOKEN must be set in .env}
     restart: unless-stopped
 
   redis:
@@ -48,13 +48,13 @@ services:
       TZ: Europe/Lisbon
       DJANGO_SETTINGS_MODULE: radar_project.settings
       DEBUG: ${DEBUG:-True}
-      SECRET_KEY: ${SECRET_KEY:-django-insecure-local-dev}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set in .env}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
       REDIS_URL: redis://redis:6379/1
       INFLUXDB_URL: http://influxdb:8086
       INFLUXDB_ORG: ${INFLUXDB_ORG:-radar_project}
       INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-sensors_data}
-      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:?INFLUXDB_TOKEN must be set in .env}
       MQTT_BROKER_HOST: mosquitto
     depends_on:
       - redis
@@ -76,7 +76,7 @@ services:
       INFLUXDB_URL: http://influxdb:8086
       INFLUXDB_ORG: ${INFLUXDB_ORG:-radar_project}
       INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-sensors_data}
-      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:-my-super-secret-token}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN:?INFLUXDB_TOKEN must be set in .env}
       MQTT_BROKER_HOST: mosquitto
     depends_on:
       - redis

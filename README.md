@@ -1,6 +1,6 @@
 # REALM — Real-time Edge-based Activity and Location Monitor
 
-REALM is a privacy-preserving, non-intrusive indoor human monitoring system built for smart home and elderly care applications. It uses Texas Instruments IWR6843ODS mmWave radar sensors deployed as wireless edge nodes to detect and track occupant presence, movement, and activity patterns — without cameras or microphones. Sensor data flows over MQTT from each Raspberry Pi node to a central Django-based home server, where it is stored in InfluxDB and visualised through a live web dashboard.
+REALM is a privacy-preserving low-intrusive indoor human monitoring system built for smart home and elderly care applications. It uses Texas Instruments IWR6843ODS mmWave radar sensors deployed as wireless edge nodes to detect and track occupant presence, movement, and activity patterns, without cameras or microphones. Sensor data flows over MQTT from each Raspberry Pi node to a central Django-based home server, where it is stored in InfluxDB and visualised through a live web dashboard.
 
 Developed at the University of Aveiro as part of the PECI course, in the context of the Casa Viva+ and VITALITY smart home research projects.
 
@@ -59,7 +59,7 @@ PECI-REALM/
 │   └── manage.py
 ├── radar-node/          Raspberry Pi node software
 │   ├── radar_manager.py Boot lifecycle manager (Wi-Fi, AP fallback)
-│   ├── node_client.py   MQTT client — heartbeat, command handling
+│   ├── node_client.py   MQTT client -> heartbeat, command handling
 │   ├── config_server.py Captive portal HTTP server (AP/provisioning mode)
 │   ├── mqtt_client.py   Reusable MQTT publish/subscribe abstraction
 │   ├── ntp_service.py   NTP offset measurement
@@ -182,18 +182,18 @@ sudo systemctl start radar_manager
 
 #### AP Mode / Auto-provisioning
 
-If the Pi cannot reach the internet on boot, it creates a Wi-Fi access point. Connect a phone or laptop to that AP and open a browser — you will be redirected to a captive portal where you can enter the Wi-Fi SSID, password, and MQTT broker IP. On save, the Pi reboots and uses those credentials to join the network.
+If the Pi cannot reach the internet on boot, it creates a Wi-Fi access point. Connect a phone or laptop to that AP and open a browser, you will be redirected to a captive portal where you can enter the Wi-Fi SSID, password, and MQTT broker IP. On save, the Pi reboots and uses those credentials to join the network.
 
 ---
 
 ## Key Features
 
-- **Semi-automatic multi-radar spatial calibration** — Nelder-Mead optimisation aligns multiple sensors into a shared coordinate frame. A step-by-step wizard in the dashboard guides the installer.
-- **NTP-based temporal synchronisation** — Each node reports its NTP offset on demand; the server triggers sync before developer-mode capture sessions to ensure frame timestamps are aligned.
-- **Deployment wizard** — A guided, non-technical installer flow with live progress feedback over WebSockets. Handles device discovery, configuration, calibration, and validation.
-- **Live + accumulated heatmaps** — The monitoring dashboard shows both real-time occupancy heatmaps and historical presence density overlaid on the room layout.
-- **Developer mode** — Coordinated multi-node data acquisition: the server sends simultaneous `start`/`stop` commands and records raw radar streams for offline analysis.
-- **Auto-provisioning (AP fallback)** — Zero-configuration first-boot experience. Nodes self-identify their network state and present a captive portal when unconfigured.
+- **Semi-automatic multi-radar spatial calibration** -> Nelder-Mead optimisation aligns multiple sensors into a shared coordinate frame. A step-by-step wizard in the dashboard guides the installer.
+- **NTP-based temporal synchronisation** -> Each node reports its NTP offset on demand; the server triggers sync before developer-mode capture sessions to ensure frame timestamps are aligned.
+- **Deployment wizard** -> A guided, non-technical installer flow with live progress feedback over WebSockets. Handles device discovery, configuration, calibration, and validation.
+- **Live + accumulated heatmaps** -> The monitoring dashboard shows both real-time occupancy heatmaps and historical presence density overlaid on the room layout.
+- **Developer mode** -> Coordinated multi-node data acquisition: the server sends simultaneous `start`/`stop` commands and records raw radar streams for offline analysis.
+- **Auto-provisioning (AP fallback)** -> Zero-configuration first-boot experience. Nodes self-identify their network state and present a captive portal when unconfigured.
 
 ---
 
@@ -217,7 +217,7 @@ If the Pi cannot reach the internet on boot, it creates a Wi-Fi access point. Co
 ### MQTT topic schema
 
 ```
-radar/{serial}/hello      Node heartbeat — published every 5 s for discovery
+radar/{serial}/hello      Node heartbeat, published every 5 s for discovery
 radar/{serial}/raw        Streaming point cloud + track data (active capture only)
 radar/{serial}/status     State confirmations from node  (e.g. {"status": "ntp_ok"})
 radar/{serial}/command    Server → node commands:  start | stop | ntp_sync
@@ -229,7 +229,7 @@ Server subscribes to wildcards `radar/+/hello` and `radar/+/status` for fleet ma
 
 ## Academic Context
 
-This project was developed as part of the **PECI** (Projeto de Engenharia e Conceção Integrada) programme at the **University of Aveiro**, in collaboration with the **Casa Viva+** and **VITALITY** smart home research initiatives. The goal is to support non-intrusive, privacy-respecting monitoring of elderly residents in assisted-living environments, enabling activity recognition and anomaly detection without cameras.
+This project was developed as part of the **PECI** (Projeto de Engenharia e Conceção Integrada) programme at the **University of Aveiro**, in collaboration with the **Casa Viva+** and **VITALITY** smart home research initiatives. The goal is to support low-intrusive, privacy-respecting monitoring of elderly residents in assisted-living environments, enabling activity recognition and anomaly detection without cameras.
 
 ---
 
@@ -240,9 +240,3 @@ This project was developed as part of the **PECI** (Projeto de Engenharia e Conc
 - Íris Biaguê — University of Aveiro
 - Joana Santiago — University of Aveiro
 - Raquel Meira — University of Aveiro
-
----
-
-## License
-
-_License to be determined._

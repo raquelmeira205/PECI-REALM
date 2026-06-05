@@ -12,8 +12,8 @@ from ntp_service import NTPManager
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 log = logging.getLogger(__name__)
 
-CONFIG_FILE = "/home/rasp2/sensor_config.json"
-RADAR_SCRIPT = "/home/rasp2/PECI-Low_Intrusive_Human_Monitoring_in_Smart_Spaces_Using_Radars/projeto/core/acquisition/stream_manager.py"
+CONFIG_FILE = "/home/pi/realm-node/config/sensor_config.json"
+RADAR_SCRIPT = "/home/pi/realm-node/acquisition/stream_manager.py"
 
 class NodeClient:
     def __init__(self):

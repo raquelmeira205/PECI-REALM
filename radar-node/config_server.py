@@ -6,7 +6,7 @@ import os
 import subprocess
 
 PORT = 8080
-CONFIG_FILE = "/home/rasp2/sensor_config.json"
+CONFIG_FILE = "/home/pi/realm-node/config/sensor_config.json"
 
 HTML_CONTENT = """
 <!DOCTYPE html>

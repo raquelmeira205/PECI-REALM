@@ -1,112 +1,112 @@
 # Radar Project (PECI M3)
 
-Este projeto foi desenvolvido em Django e tem como principal objetivo permitir o registo dinâmico, descoberta (Auto-Discovery) e a monitorização em tempo real de radares de ocupação através de *WebSockets* e *MQTT*.
+This project was developed in Django and its main goal is to enable dynamic registration, auto-discovery, and real-time monitoring of occupancy radars via *WebSockets* and *MQTT*.
 
-A arquitetura inclui um **Frontend** interativo impulsionado com HTMX, um **Servidor Django** com suporte para WebSockets (Django Channels), um **Worker MQTT** que ingere dados teleméricos dos radares, uma **Base de Dados Time-Series (InfluxDB)** para persistência histórica de telemetria, e um **Cache em Tempo Real (Redis)** para comunicação assíncrona entre componentes.
-
----
-
-## 🛠️ Pré-requisitos
-
-### Stack 100% Docker
-
-**Versão mínima:**
-- **Docker Desktop** (Windows/Mac/Linux) com suporte para Docker Compose
-
-Todos os serviços passam a correr em containers: Django, Worker MQTT, Redis, InfluxDB e Mosquitto.
+The architecture includes an interactive **Frontend** powered by HTMX, a **Django Server** with WebSocket support (Django Channels), an **MQTT Worker** that ingests telemetry data from the radars, a **Time-Series Database (InfluxDB)** for historical telemetry persistence, and a **Real-Time Cache (Redis)** for asynchronous communication between components.
 
 ---
 
-## 🚀 Quick Start com Docker
+## 🛠️ Prerequisites
 
-A forma mais rápida de correr o projeto completo é subir a stack inteira em Docker:
+### 100% Docker Stack
+
+**Minimum version:**
+- **Docker Desktop** (Windows/Mac/Linux) with Docker Compose support
+
+All services run in containers: Django, MQTT Worker, Redis, InfluxDB, and Mosquitto.
+
+---
+
+## 🚀 Quick Start with Docker
+
+The fastest way to run the full project is to bring up the entire stack in Docker:
 
 ```powershell
-# 1. Certifica-te que estás na pasta do projeto
+# 1. Make sure you are in the project folder
 cd path/to/radar_project
 
-# 2. Sobe todos os serviços em background
+# 2. Start all services in the background
 docker compose up --build -d
 
-# 3. Verifica os logs do web e do worker se quiseres acompanhar o arranque
+# 3. Follow the web and worker logs if you want to monitor startup
 docker compose logs -f web worker
 ```
 
-**Status dos Serviços:**
+**Service URLs:**
 - Django (Web Server): http://127.0.0.1:8000/
 - InfluxDB (Admin): http://127.0.0.1:8086/ (user: `admin`)
 - Redis: localhost:6379
 - Mosquitto MQTT: localhost:1883
 
-**Acesso a partir de outro dispositivo na mesma rede:**
-- Não uses `localhost` no telemóvel. Abre o projeto com o IP local do computador, por exemplo `http://192.168.1.10:8000/`.
-- Se o browser não responder, confirma que a porta `8000` está permitida na firewall do Windows.
-- O container Django já está a escutar em `0.0.0.0:8000` e `DJANGO_ALLOWED_HOSTS` está aberto para desenvolvimento local.
+**Accessing from another device on the same network:**
+- Do not use `localhost` on a phone. Open the project using the computer's local IP, e.g. `http://192.168.1.10:8000/`.
+- If the browser does not respond, confirm that port `8000` is allowed through the Windows firewall.
+- The Django container is already listening on `0.0.0.0:8000` and `DJANGO_ALLOWED_HOSTS` is open for local development.
 
-**Para parar todos os serviços:**
+**To stop all services:**
 ```powershell
 docker compose down
 ```
 
-**Comandos úteis:**
+**Useful commands:**
 ```powershell
-# Executar uma migration manual dentro do container
+# Run a manual migration inside the container
 docker compose exec web python manage.py migrate
 
-# Criar superutilizador Django
+# Create a Django superuser
 docker compose exec web python manage.py createsuperuser
 
-# Ver os logs do worker MQTT
+# Follow the MQTT worker logs
 docker compose logs -f worker
 ```
 
 ---
 
-## 🔧 Variáveis de Ambiente (.env)
+## 🔧 Environment Variables (.env)
 
-Todas as credenciais e configurações sensíveis são geridas via `.env`. Certifica-te de que o ficheiro existe no root do projeto:
+All sensitive credentials and configuration are managed via `.env`. Make sure the file exists at the project root:
 
 ```bash
 # ============================================
 # InfluxDB Configuration
 # ============================================
 INFLUXDB_URL=http://localhost:8086
-INFLUXDB_INIT_USERNAME=admin                       # Utilizador inicial do InfluxDB
-INFLUXDB_INIT_PASSWORD=password_estudante_123      # ⚠️ ALTERAR EM PRODUÇÃO
-INFLUXDB_TOKEN=my-super-secret-token               # ⚠️ GERAR TOKEN NOVO EM PRODUÇÃO
-INFLUXDB_ORG=radar_project                         # Organização padrão
-INFLUXDB_BUCKET=sensors_data                       # Bucket para dados dos sensores
+INFLUXDB_INIT_USERNAME=admin                       # Initial InfluxDB admin user
+INFLUXDB_INIT_PASSWORD=change-me                   # ⚠️ CHANGE IN PRODUCTION
+INFLUXDB_TOKEN=change-me-to-a-long-random-token    # ⚠️ GENERATE A NEW TOKEN IN PRODUCTION
+INFLUXDB_ORG=radar_project                         # Default organisation
+INFLUXDB_BUCKET=sensors_data                       # Bucket for sensor data
 
 # ============================================
 # Redis Configuration
 # ============================================
-REDIS_URL=redis://127.0.0.1:6379/1                 # URL de conexão do Redis
+REDIS_URL=redis://127.0.0.1:6379/1                 # Redis connection URL
 
 # ============================================
 # Django Configuration
 # ============================================
-DEBUG=True                                         # ⚠️ Colocar False em produção
-SECRET_KEY=your-secret-key-change-in-production  # ⚠️ GERAR NOVA EM PRODUÇÃO
+DEBUG=True                                         # ⚠️ Set to False in production
+SECRET_KEY=your-secret-key-change-in-production    # ⚠️ GENERATE A NEW KEY IN PRODUCTION
 ```
 
-**⚠️ AVISO DE SEGURANÇA:**
-Os valores padrão acima são apenas para **desenvolvimento local**. Em produção:
-- Gera um novo `INFLUXDB_TOKEN` via interface do InfluxDB
-- Altera `INFLUXDB_INIT_PASSWORD` para uma senha forte
-- Gera um novo `SECRET_KEY` Django
-- Define `DEBUG=False`
+**⚠️ SECURITY WARNING:**
+The placeholder values above are for **local development only**. In production:
+- Generate a new `INFLUXDB_TOKEN` via the InfluxDB UI
+- Set `INFLUXDB_INIT_PASSWORD` to a strong password
+- Generate a new Django `SECRET_KEY`
+- Set `DEBUG=False`
 
 ---
 
-## 🔧 Variáveis de Ambiente
+## 🔧 Environment Variables
 
-O projeto usa o ficheiro `.env` no root. Podes começar copiando o exemplo:
+The project uses a `.env` file at the root. You can start by copying the example:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Se quiseres alterar a configuração do stack, ajusta sobretudo:
+If you want to change the stack configuration, adjust in particular:
 - `INFLUXDB_INIT_USERNAME`
 - `INFLUXDB_INIT_PASSWORD`
 - `INFLUXDB_ORG`
@@ -115,38 +115,38 @@ Se quiseres alterar a configuração do stack, ajusta sobretudo:
 - `SECRET_KEY`
 - `DJANGO_ALLOWED_HOSTS`
 
-O worker MQTT e o Django já apontam para os nomes de serviço do Docker:
+The MQTT worker and Django already point to Docker service names:
 - Redis: `redis`
 - InfluxDB: `influxdb`
 - Mosquitto: `mosquitto`
 
 ---
 
-## 📊 Fluxo de Dados e Arquitetura
+## 📊 Data Flow and Architecture
 
-### Diagrama de Fluxo
+### Flow Diagram
 
 ```
 ┌─────────────────┐
-│  Radares Físicos│ (Hardware)
-│   (Ocupação)    │
+│  Physical Radars│ (Hardware)
+│  (Occupancy)    │
 └────────┬────────┘
          │
          │ MQTT Publish (batch)
          │ Topic: radar/<SN>/raw
          ▼
 ┌─────────────────┐
-│  Broker MQTT    │ (localhost:1883)
+│  MQTT Broker    │ (localhost:1883)
 │  (Mosquitto)    │
 └────────┬────────┘
          │
          │ Subscribe + Process
          ▼
 ┌──────────────────────┐
-│  Worker MQTT Django  │ (manage.py mqtt_worker)
+│  Django MQTT Worker  │ (manage.py mqtt_worker)
 │  - Auto-discovery    │
-│  - Gerenciar estado  │
-│  - Preparar dados    │
+│  - State management  │
+│  - Data preparation  │
 └────────┬────────┬────┘
          │        │
          │        │ Broadcast via channels
@@ -179,15 +179,15 @@ O worker MQTT e o Django já apontam para os nomes de serviço do Docker:
 └───────────────────┘
 ```
 
-### Tópico MQTT e Payload
+### MQTT Topic and Payload
 
-**Tópico de Subscrição:**
+**Subscription topic:**
 ```
 radar/+/raw
 ```
-Exemplo expandido: `radar/ABC123XYZ/raw` (SN do radar extraído automaticamente)
+Expanded example: `radar/ABC123XYZ/raw` (radar serial number extracted automatically)
 
-**Formato do Payload (JSON):**
+**Payload format (JSON):**
 ```json
 [
   {
@@ -211,37 +211,37 @@ Exemplo expandido: `radar/ABC123XYZ/raw` (SN do radar extraído automaticamente)
 ]
 ```
 
-### Schema InfluxDB
+### InfluxDB Schema
 
 **Measurement:** `radar_data`
 
-**Tags** (para filtros e queries):
-- `room_id` — Identificador da sala
-- `home_id` — Identificador da habitação
-- `radar_sn` — Serial Number do radar
-- `target_id` — ID do target dentro do frame
+**Tags** (for filtering and queries):
+- `room_id` — Room identifier
+- `home_id` — Home identifier
+- `radar_sn` — Radar serial number
+- `target_id` — Target ID within the frame
 
-**Fields** (dados numéricos):
-- `x` (float) — Coordenada X em metros
-- `y` (float) — Coordenada Y em metros
-- `z` (float) — Coordenada Z em metros
+**Fields** (numerical data):
+- `x` (float) — X coordinate in metres
+- `y` (float) — Y coordinate in metres
+- `z` (float) — Z coordinate in metres
 
-**Exemplar Query InfluxQL:**
+**Example InfluxQL query:**
 ```sql
 SELECT x, y, z FROM radar_data 
 WHERE room_id='5' AND time > now() - 1h
 ORDER BY time DESC
 ```
 
-### Componentes Redis
+### Redis Components
 
-O Django Channels usa Redis para comunicação assíncrona entre o Worker MQTT e as WebSocket connections:
+Django Channels uses Redis for asynchronous communication between the MQTT Worker and WebSocket connections:
 
 **Channel Groups:**
-- `available_radars` — Broadcasting de descoberta de novos radares
-- `room_{id}` — Broadcasting de dados em tempo real para cada sala
+- `available_radars` — Broadcasting of newly discovered radars
+- `room_{id}` — Real-time data broadcasting for each room
 
-Exemplo de broadcast do Worker:
+Worker broadcast example:
 ```python
 async_to_sync(self.channel_layer.group_send)(
     f'room_{radar.room.id}',
@@ -258,7 +258,7 @@ async_to_sync(self.channel_layer.group_send)(
 
 ---
 
-## 🏗️ Estrutura Resumida
+## 🏗️ App Structure
 
 ```text
 apps/
@@ -274,30 +274,30 @@ apps/
 ```
 
 - **core/**  
-   Código partilhado por todas as apps. Inclui modelos base com timestamps, mixins, permissões genéricas e utilitários comuns.
+   Code shared across all apps. Includes base models with timestamps, mixins, generic permissions, and common utilities.
 
 - **users/**  
-   Autenticação e perfis de utilizador: registo, login, logout e gestão de contas. Define tipos de utilizador (técnico de instalação, residente, cuidador e developer) e inclui consentimento RGPD.
+   User authentication and profiles: registration, login, logout, and account management. Defines user types (installation technician, resident, carer, and developer) and includes GDPR consent.
 
 - **environments/**  
-   Representa o espaço físico monitorizado. Guarda habitações (`Home`) e divisões (`Room`) com nome, tipo e dimensões.
+   Represents the monitored physical space. Stores homes (`Home`) and rooms (`Room`) with name, type, and dimensions.
 
 - **sensors_devices/**  
-   Gestão dos dispositivos físicos de radar: UID/MAC, papel (master/worker), estado (online/offline) e associação a `Room`.
+   Management of physical radar devices: UID/MAC, role (master/worker), status (online/offline), and association to a `Room`.
 
 - **sensors_data/**  
-   Processa o que os sensores produzem: recebe point clouds, guarda séries temporais e calcula métricas de atividade (distância percorrida, velocidade média, etc.).
+   Processes what the sensors produce: receives point clouds, stores time series, and computes activity metrics (distance travelled, average speed, etc.).
 
 - **deployment/**  
-   Processo de instalação e calibração. Guia o técnico no wizard (IR1), faz auto-discovery de radares (FR1) e suporta calibração espacial semi-automática (FR2).
+   Installation and calibration workflow. Guides the technician through the wizard (IR1), performs radar auto-discovery (FR1), and supports semi-automatic spatial calibration (FR2).
 
 - **dashboard/**  
-   Visualização para o utilizador final: heatmaps por divisão (FR3), gráficos de atividade diária/semanal (FR4/FR8) e resumo de movimento (FR5). Não persiste dados, consome de `sensors_data`.
+   End-user visualisation: per-room heatmaps (FR3), daily/weekly activity charts (FR4/FR8), and movement summary (FR5). Does not persist data — consumes from `sensors_data`.
 
 - **developer/**  
-   Modo de investigação técnica. Permite iniciar/parar sessões de aquisição sincronizada de dados brutos de múltiplos radares (FR6/IR3) e exportar datasets para análise offline.
+   Technical investigation mode. Allows starting/stopping synchronised raw data acquisition sessions across multiple radars (FR6/IR3) and exporting datasets for offline analysis.
 
 - **web_api/**  
-   Interface REST para integração externa (telemóveis/tablets). Expõe dados de atividade e heatmaps (IR4), sendo o ponto de saída de dados do sistema.
+   REST interface for external integration (phones/tablets). Exposes activity data and heatmaps (IR4) as the system's data output point.
 
-*Desenvolvido em ambiente de Pair-Programming.*
+*Developed in a Pair-Programming environment.*
